@@ -1,0 +1,90 @@
+{
+   "builders": [
+       {
+           "type": "virtualbox-iso",
+           "boot_command": [
+               "<enter><wait>",
+               "<f6><esc>",
+               "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+               "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+               "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+               "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+               "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+               "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+               "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+               "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+               "<bs><bs><bs>",
+               "/install/vmlinuz ",
+               "initrd=/install/initrd.gz ",
+               "net.ifnames=0 ","/install/vmlinuz",
+               " auto",
+               " console-setup/ask_detect=false",
+               " console-setup/layoutcode=us",
+               " console-setup/modelcode=pc105",
+               " debconf/frontend=noninteractive",
+               " debian-installer=en_US",
+               " fb=false",
+               " initrd=/install/initrd.gz",
+               " kbd-chooser/method=us",
+               " keyboard-configuration/layout=USA",
+               " keyboard-configuration/variant=USA",
+               " locale=en_US",
+               " netcfg/get_domain=vm",
+               " netcfg/get_hostname=vagrant",
+               " grub-installer/bootdev=/dev/sda",
+               " noapic",
+               " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+               "<enter>"
+               ],
+           "boot_wait": "10s",
+           "disk_size": 81920,
+           "guest_os_type": "Ubuntu_64",
+           "headless": false,
+           "http_directory": "http",
+           "iso_urls": [
+               "file://D:/packer_templates-master/Ubuntu-18.04/ubuntu-16.04.5-server-amd64.iso"
+           ],
+           "iso_checksum_type": "sha256",
+           "iso_checksum": "c94de1cc2e10160f325eb54638a5b5aa38f181d60ee33dae9578d96d932ee5f8",
+           "ssh_username": "vagrant",
+           "ssh_password": "vagrant",
+           "ssh_port": 22,
+           "ssh_wait_timeout": "10000s",
+           "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+           "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+           "virtualbox_version_file": ".vbox_version",
+           "vm_name": "packer-ubuntu-18.04.1-amd64",
+           "vboxmanage": [
+           [
+               "modifyvm",
+               "{{.Name}}",
+               "--memory",
+               "2048"
+           ],
+           [
+               "modifyvm",
+               "{{.Name}}",
+               "--cpus",
+               "4"
+           ]
+           ]
+       }
+   ],
+   "provisioners": [
+       {
+           "type": "shell",
+           "script": "scripts/init.sh",
+           "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'"
+       },
+       {
+           "type": "shell",
+           "script": "scripts/cleanup.sh",
+           "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'"
+       }
+   ],
+   "post-processors": [{
+     "type": "vagrant",
+     "compression_level": "8",
+     "output": "output/ubuntu-18.04.1.box"
+   }]
+ }
